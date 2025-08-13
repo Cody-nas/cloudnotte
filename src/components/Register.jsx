@@ -10,6 +10,7 @@ import {
   X,
   AlertCircle,
 } from "lucide-react";
+import image from "../assets/Whisk_07.jpg";
 
 export default function AccountCreationForm() {
   const [formData, setFormData] = useState({
@@ -148,7 +149,7 @@ export default function AccountCreationForm() {
   const strengthLabels = ["", "Very Weak", "Weak", "Fair", "Good", "Strong"];
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left side - Form */}
       <div className="w-full lg:w-1/2 bg-gray-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
@@ -451,16 +452,22 @@ export default function AccountCreationForm() {
       </div>
 
       {/* Right side - Hero Image */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div className="relative z-10 text-center text-white p-6 max-w-md">
-          <h2 className="text-3xl font-bold mb-4 leading-tight">
-            Learning Made Easier & Accessible
-          </h2>
-          <p className="text-lg text-gray-200 leading-relaxed">
-            Digitalized assignments, timetable and stay connected with
-            classmates
-          </p>
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <img
+          src={image}
+          alt="Learning platform illustration"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0  bg-opacity-80 flex items-center justify-center">
+          <div className="text-center  text-white p-6 max-w-md">
+            <h2 className="text-3xl font-bold mb-4 leading-tight">
+              Learning Made Easier & Accessible
+            </h2>
+            <p className="text-lg text-gray-200 leading-relaxed">
+              Digitalized assignments, timetable and stay connected with
+              classmates
+            </p>
+          </div>
         </div>
       </div>
     </div>

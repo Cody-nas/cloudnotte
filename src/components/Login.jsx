@@ -33,7 +33,7 @@ export default function CloudnotteLogin() {
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
       {/* Left Side - Login Form (Enhanced for mobile) */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-5 py-8 sm:px-8 md:px-12 lg:px-16">
-        <div className="max-w-md w-full mx-auto bg-white rounded-xl shadow-sm p-6 sm:p-8">
+        <div className="max-w-lg w-full mx-auto bg-white rounded-2xl shadow-sm p-6 sm:p-8">
           {/* Logo with better spacing */}
           <div className="mb-8">
             <div className="flex items-center gap-3">
@@ -223,11 +223,11 @@ export default function CloudnotteLogin() {
           </p>
 
           {/* Decorative dots */}
-          <div className="flex justify-center space-x-2">
+          {/* <div className="flex justify-center space-x-2">
             <div className="w-2 h-2 bg-white rounded-full"></div>
             <div className="w-8 h-2 bg-white rounded-full"></div>
             <div className="w-2 h-2 bg-white rounded-full"></div>
-          </div>
+          </div> */}
         </div>
 
         {/* Yellow accent element */}
