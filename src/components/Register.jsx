@@ -87,27 +87,85 @@ export default function AccountCreationForm() {
   };
 
   const handleSubmit = async () => {
+    console.log("handleSubmit called");
     setIsSubmitting(true);
 
     // Validate all fields
     const newErrors = {};
     Object.keys(formData).forEach((key) => {
       if (key !== "referralCode") {
-        // referralCode is optional
         const error = validateField(key, formData[key]);
         if (error) newErrors[key] = error;
       }
     });
 
+    console.log("Validation errors:", newErrors);
     setErrors(newErrors);
     setTouched(
       Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {})
     );
 
     if (Object.keys(newErrors).length === 0) {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log("Form submitted:", formData);
+      const inputData = {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber,
+        referralCode: formData.referralCode || null,
+      };
+      console.log("Input data being sent:", inputData); // Debug: Log the exact input
+      try {
+        console.log("No validation errors, sending request...");
+        const response = await fetch(
+          "https://staging-api-v3.cloudnotte.com/graphql",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              query: `
+              mutation CreateUser($input: CreateUserInput!) {
+                createUser(input: $input) {
+                  token
+                }
+              }
+            `,
+              variables: { input: inputData },
+            }),
+          }
+        );
+
+        console.log("Request sent, awaiting response...");
+        const result = await response.json();
+        console.log("Response received:", result);
+
+        if (result.errors) {
+          const errorMessage =
+            result.errors[0]?.message ||
+            "Failed to create account. Please try again.";
+          console.error("GraphQL Errors:", result.errors);
+          setErrors({
+            ...errors,
+            form: errorMessage,
+          });
+        } else {
+          console.log("Form submitted successfully:", result.data.createUser);
+          setErrors({}); // Clear errors on success
+          // Optionally redirect or show success message
+          // window.location.href = "/login";
+        }
+      } catch (error) {
+        console.error("Network Error:", error);
+        setErrors({
+          ...errors,
+          form: "Network error occurred. Please check your connection and try again.",
+        });
+      }
+    } else {
+      console.log("Request not sent due to validation errors");
     }
 
     setIsSubmitting(false);
@@ -163,6 +221,14 @@ export default function AccountCreationForm() {
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-4 space-y-4">
+            {/* Form-level error */}
+            {errors.form && (
+              <p className="text-xs text-red-600 flex items-center">
+                <AlertCircle className="h-3 w-3 mr-1" />
+                {errors.form}
+              </p>
+            )}
+
             {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>

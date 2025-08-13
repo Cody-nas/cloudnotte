@@ -21,11 +21,69 @@ export default function CloudnotteLogin() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("handleSubmit called"); // Debug: Confirm function is triggered
     if (validateForm()) {
-      console.log("Login submitted", { email, password, keepLoggedIn });
-      // Add your login logic here
+      console.log("Validation passed, sending request..."); // Debug: Confirm validation
+      const inputData = {
+        identifier: email,
+        password: password,
+      };
+      console.log("Input data being sent:", inputData); // Debug: Log input data
+      try {
+        const response = await fetch(
+          "https://staging-api-v3.cloudnotte.com/graphql",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              query: `
+              mutation LoginUser($input: LoginUserInput!) {
+                loginUser(input: $input) {
+                  token
+                  isVerified
+                }
+              }
+            `,
+              variables: {
+                input: inputData,
+              },
+            }),
+          }
+        );
+
+        console.log("Request sent, awaiting response..."); // Debug: Confirm request sent
+        const result = await response.json();
+        console.log("Response received:", result); // Debug: Log full response
+
+        if (result.errors) {
+          console.error("GraphQL Errors:", result.errors);
+          setErrors({
+            ...errors,
+            form:
+              result.errors[0]?.message ||
+              "Failed to log in. Please try again.",
+          });
+        } else {
+          console.log("Login successful:", result.data.loginUser);
+          setErrors({}); // Clear errors on success
+          // Optionally store token or redirect
+          // localStorage.setItem('token', result.data.loginUser.token);
+          // window.location.href = "/dashboard";
+        }
+      } catch (error) {
+        console.error("Network Error:", error);
+        setErrors({
+          ...errors,
+          form: "Network error occurred. Please check your connection and try again.",
+        });
+      }
+    } else {
+      console.log("Request not sent due to validation errors"); // Debug: Validation failed
     }
   };
 
@@ -53,6 +111,25 @@ export default function CloudnotteLogin() {
             </h1>
             <p className="text-gray-600 text-base">Sign in to your account</p>
           </div>
+
+          {/* Form-level error */}
+          {errors.form && (
+            <p className="mb-4 text-xs text-red-500 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-3 w-3 mr-1"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {errors.form}
+            </p>
+          )}
 
           {/* Login Form with better spacing */}
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -221,13 +298,6 @@ export default function CloudnotteLogin() {
             Digitalized lesson notes, timetable and CBT exams with full report
             sheets all in one platform.
           </p>
-
-          {/* Decorative dots */}
-          {/* <div className="flex justify-center space-x-2">
-            <div className="w-2 h-2 bg-white rounded-full"></div>
-            <div className="w-8 h-2 bg-white rounded-full"></div>
-            <div className="w-2 h-2 bg-white rounded-full"></div>
-          </div> */}
         </div>
 
         {/* Yellow accent element */}
